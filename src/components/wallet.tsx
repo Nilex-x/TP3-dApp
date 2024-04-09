@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Web3 from "web3";
+import { WalletContext } from "../context/wallet";
 
 export const Wallet = () => {
-  const [account, setAccount] = useState<string>("");
+  const [accounts, setAccounts] = useState<string[]>([]);
+  const { account: selectedAccount, setAccount } = useContext(WalletContext);
 
   const loadBlockChain = async () => {
     const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
     const accounts = await web3.eth.getAccounts();
 
-    setAccount(accounts[0]);
+    setAccounts(accounts);
   };
 
   useEffect(() => {
@@ -16,8 +18,16 @@ export const Wallet = () => {
   }, []);
 
   return (
-    <div>
-      <p>{account}</p>
-    </div>
+    <select
+      onChange={(e) => setAccount(e.target.value)}
+      defaultValue={selectedAccount}
+      className="p-2 border border-gray-300 rounded"
+    >
+      {accounts.map((account) => (
+        <option key={account} value={account}>
+          {account}
+        </option>
+      ))}
+    </select>
   );
 };
