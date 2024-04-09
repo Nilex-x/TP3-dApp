@@ -1,7 +1,12 @@
 import "./App.css";
+import { Wallet } from "./components/wallet";
 
 function App() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+  return (
+    <>
+      <Wallet />
+    </>
+  );
 }
 
 export default App;
