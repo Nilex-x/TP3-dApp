@@ -1,5 +1,4 @@
 export const TODO_LIST_ABI = [
-  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   {
     anonymous: false,
     inputs: [
