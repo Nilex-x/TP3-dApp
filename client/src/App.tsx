@@ -1,6 +1,7 @@
 import { MetaMaskProvider } from "@metamask/sdk-react";
 import { useState } from "react";
 import "./App.css";
+import { ContractComponent as Contract } from "./components/contract";
 import { Wallet } from "./components/wallet";
 import { WalletContext } from "./context/wallet";
 
@@ -15,7 +16,6 @@ function App() {
           name: "TP3 - Wallet",
           url: window.location.href,
         },
-        // Other options
       }}
     >
       <WalletContext.Provider
@@ -25,6 +25,7 @@ function App() {
         }}
       >
         <Wallet />
+        <Contract />
       </WalletContext.Provider>
     </MetaMaskProvider>
   );

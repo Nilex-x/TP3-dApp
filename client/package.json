@@ -13,6 +13,8 @@
     "@metamask/sdk-react": "^0.18.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "truffle": "^5.11.5",
+    "truffle-contract": "^4.0.31",
     "web3": "^4.7.0"
   },
   "devDependencies": {

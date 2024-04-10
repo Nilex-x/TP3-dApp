@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.5.16;
 
 contract TodoList {
     uint public taskCount = 0;
@@ -13,7 +13,7 @@ contract TodoList {
     mapping(uint => Task) public tasks;
 
     constructor() public {
-        createTask("Check out dappuniversity.com");
+        createTask("TP3 Blockchain");
     }
 
     modifier onlyOwner(uint _id) {
