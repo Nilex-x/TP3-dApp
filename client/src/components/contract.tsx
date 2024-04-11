@@ -128,81 +128,70 @@ export const ContractComponent = () => {
     }
   };
 
-  if (!account) {
+  if (!connected || !account) {
     return (
-      <div style={{ margin: 20 }}>
-        <h1>Connect your wallet to interact with the contract</h1>
-      </div>
-    );
-  }
-
-  if (!connected) {
-    return (
-      <div style={{ margin: 20 }}>
+      <div className="mt-8">
         You need to connect your wallet to interact with the contract
       </div>
     );
   }
 
   return (
-    <div style={{ margin: 20 }}>
-      <form onSubmit={createTask}>
+    <div className="mt-8">
+      <form
+        onSubmit={createTask}
+        className="flex items-center justify-center gap-x-3"
+      >
         <input
-          style={{
-            backgroundColor: "#a3a3a3",
-            borderRadius: 10,
-            paddingInlineStart: 10,
-          }}
+          className="px-4 py-2 border border-gray-300 rounded"
+          placeholder="Task name"
           name="content"
           type="text"
           onChange={(e) => setContent(e.target.value)}
         />
-        <button style={{ marginLeft: 10 }} type="submit">
-          create
+        <button
+          className="px-4 py-2 text-white bg-blue-400 rounded hover:bg-blue-500"
+          type="submit"
+        >
+          Add task
         </button>
       </form>
-      <div
-        style={{
-          display: "flew",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {tasks.map((task, index) => (
-          <div
-            style={{ display: "flex", flexDirection: "row" }}
-            key={"task" + index}
-          >
-            <div style={{ margin: 10 }}>{task.content}</div>
-            {!task.validated && (
-              <button
-                style={{
-                  margin: 5,
-                  backgroundColor: "yellow",
-                  padding: 5,
-                  borderRadius: 6,
-                }}
-                onClick={() => validateTask(task.id)}
+      <div className="flex flex-col-reverse mt-4">
+        {tasks.map((task, index) => {
+          if (task.owner.toLowerCase() !== account.toLowerCase()) return null;
+
+          return (
+            <div
+              className="flex items-center justify-between px-4 py-2 mt-2 border border-gray-300 rounded"
+              key={"task" + index}
+            >
+              <div
+                className={`font-bold ${task.completed ? "line-through" : ""} ${
+                  !task.validated ? "text-red-500" : ""
+                }`}
               >
-                Validate
-              </button>
-            )}
-            {!task.completed && (
-              <button
-                style={{
-                  margin: 5,
-                  backgroundColor: "green",
-                  padding: 5,
-                  borderRadius: 6,
-                }}
-                onClick={() => completeTask(task.id)}
-              >
-                Complete
-              </button>
-            )}
-          </div>
-        ))}
+                {task.content}
+              </div>
+              <div className="flex gap-x-2">
+                <button
+                  className="px-4 py-2 text-white bg-blue-400 rounded hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-400"
+                  disabled={task.validated}
+                  onClick={() => validateTask(task.id)}
+                >
+                  Validate
+                </button>
+
+                <button
+                  className="px-4 py-2 text-white bg-green-400 rounded hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-400"
+                  disabled={task.completed}
+                  onClick={() => completeTask(task.id)}
+                >
+                  Complete
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
