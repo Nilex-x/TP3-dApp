@@ -47,7 +47,7 @@ export const ContractComponent = () => {
     // Load contract
     const contract = await window.ethereum?.request({
       method: "eth_getCode",
-      params: ["0x1814FfCab5879A3df9689BfB336ff12f4787121b"], // smart contract address
+      params: [import.meta.env.VITE_SMART_CONTRACT_ADDRESS], // smart contract address
     });
 
     // Check if contract is deployed
@@ -61,7 +61,7 @@ export const ContractComponent = () => {
     // Get contract instance
     const instance = new web3.eth.Contract(
         TODO_LIST_CONFIG.abi,
-      "0x1814FfCab5879A3df9689BfB336ff12f4787121b" // smart contract address
+        import.meta.env.VITE_SMART_CONTRACT_ADDRESS // smart contract address
     );
 
     setTodoList(instance);
