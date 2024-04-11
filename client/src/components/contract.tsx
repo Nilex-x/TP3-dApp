@@ -3,7 +3,8 @@ import Web3, { Address, Contract, Uint } from "web3";
 import { TODO_LIST_ABI } from "../config";
 import { WalletContext } from "../context/wallet";
 
-import TODO_LIST_CONFIG from '../../../build/contracts/TodoList.json';
+import { useSDK } from "@metamask/sdk-react";
+import TODO_LIST_CONFIG from "../../../build/contracts/TodoList.json";
 
 interface TaskType {
   owner: Address;
@@ -17,7 +18,8 @@ export const ContractComponent = () => {
   const { account } = useContext(WalletContext);
   const [todoList, setTodoList] = useState<Contract<typeof TODO_LIST_ABI>>();
   const [tasks, setTasks] = useState<Array<TaskType>>([]);
-  const [content, setContent] = useState<string>('');
+  const [content, setContent] = useState<string>("");
+  const { connected } = useSDK();
 
   const getTasks = async (todolist: Contract<typeof TODO_LIST_ABI>) => {
     const taskTmp: Array<TaskType> = [];
@@ -27,7 +29,7 @@ export const ContractComponent = () => {
       .taskCount()
       .call();
 
-    for (var i = 1; i <= taskCount!; i++) {
+    for (let i = 1; i <= taskCount!; i++) {
       const task: any & TaskType = await todolist.methods.tasks(i).call();
       taskTmp.push({
         owner: task.owner,
@@ -38,7 +40,6 @@ export const ContractComponent = () => {
       });
     }
 
-    console.log(taskTmp);
     setTasks(taskTmp);
   };
 
@@ -60,8 +61,8 @@ export const ContractComponent = () => {
 
     // Get contract instance
     const instance = new web3.eth.Contract(
-        TODO_LIST_CONFIG.abi,
-        import.meta.env.VITE_SMART_CONTRACT_ADDRESS // smart contract address
+      TODO_LIST_CONFIG.abi,
+      import.meta.env.VITE_SMART_CONTRACT_ADDRESS // smart contract address
     );
 
     setTodoList(instance);
@@ -108,7 +109,7 @@ export const ContractComponent = () => {
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const completeTask = async (id: Uint) => {
     if (!todoList) {
@@ -125,6 +126,22 @@ export const ContractComponent = () => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  if (!account) {
+    return (
+      <div style={{ margin: 20 }}>
+        <h1>Connect your wallet to interact with the contract</h1>
+      </div>
+    );
+  }
+
+  if (!connected) {
+    return (
+      <div style={{ margin: 20 }}>
+        You need to connect your wallet to interact with the contract
+      </div>
+    );
   }
 
   return (
@@ -144,18 +161,46 @@ export const ContractComponent = () => {
           create
         </button>
       </form>
-      <div style={{ display: "flew", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+      <div
+        style={{
+          display: "flew",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         {tasks.map((task, index) => (
-          <div style={{ display: 'flex', flexDirection: "row" }} key={"task" + index}>
-            <div style={{ margin: 10 }}>
-              {task.content}
-            </div>
-            {!task.validated &&
-              <button style={{ margin: 5, backgroundColor: "yellow", padding: 5, borderRadius: 6 }} onClick={() => validateTask(task.id)}>Validate</button>
-            }
-            {!task.completed &&
-              <button style={{ margin: 5, backgroundColor: "green", padding: 5, borderRadius: 6 }} onClick={() => completeTask(task.id)}>Complete</button>
-            }
+          <div
+            style={{ display: "flex", flexDirection: "row" }}
+            key={"task" + index}
+          >
+            <div style={{ margin: 10 }}>{task.content}</div>
+            {!task.validated && (
+              <button
+                style={{
+                  margin: 5,
+                  backgroundColor: "yellow",
+                  padding: 5,
+                  borderRadius: 6,
+                }}
+                onClick={() => validateTask(task.id)}
+              >
+                Validate
+              </button>
+            )}
+            {!task.completed && (
+              <button
+                style={{
+                  margin: 5,
+                  backgroundColor: "green",
+                  padding: 5,
+                  borderRadius: 6,
+                }}
+                onClick={() => completeTask(task.id)}
+              >
+                Complete
+              </button>
+            )}
           </div>
         ))}
       </div>

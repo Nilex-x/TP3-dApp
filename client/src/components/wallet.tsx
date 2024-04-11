@@ -21,11 +21,15 @@ export const Wallet = () => {
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
-      setAccount(accounts?.[0]);
+      setAccount(accounts[0]);
     } catch (err) {
       console.warn("failed to connect..", err);
     }
   };
+
+  useEffect(() => {
+    console.log(connected);
+  }, [connected]);
 
   const disconnect = async () => {
     try {
