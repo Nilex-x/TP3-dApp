@@ -34,15 +34,8 @@ contract TodoList {
         bool completed
     );
 
-    function createTask(string memory _content) public {
+    function createTask(string memory _content) public payable {
         tasks[taskCount] = Task(msg.sender, taskCount, _content, false, false);
-        taskCount++;
-        emit TaskCreated(taskCount, _content);
-    }
-
-    function createValidTask(string memory _content) public payable {
-        require(msg.value > 0, "Zero amount not allowed");
-        tasks[taskCount] = Task(msg.sender, taskCount, _content, true, false);
         taskCount++;
         emit TaskCreated(taskCount, _content);
     }

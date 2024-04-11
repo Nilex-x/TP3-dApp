@@ -3,6 +3,8 @@ import Web3, { Address, Contract, Uint } from "web3";
 import { TODO_LIST_ABI } from "../config";
 import { WalletContext } from "../context/wallet";
 
+import TODO_LIST_CONFIG from '../../../build/contracts/TodoList.json';
+
 interface TaskType {
   owner: Address;
   id: Uint;
@@ -42,27 +44,24 @@ export const ContractComponent = () => {
 
   // Load todolist with truffle
   const loadTodolist = async () => {
-    // // Load contract
-    // const contract = await window.ethereum?.request({
-    //   method: "eth_getCode",
-    //   params: ["0x25E1D47DAEE37b8b648466Aa063DfDcE1FdD8466"], // smart contract address
-    // });
-    // console.log(contract);
+    // Load contract
+    const contract = await window.ethereum?.request({
+      method: "eth_getCode",
+      params: ["0x1814FfCab5879A3df9689BfB336ff12f4787121b"], // smart contract address
+    });
 
-    // // Check if contract is deployed
-    // if (contract === "0x") {
-    //   console.log("Contract not deployed");
-    //   return;
-    // }
+    // Check if contract is deployed
+    if (contract === "0x") {
+      console.log("Contract not deployed");
+      return;
+    }
 
-    const web3 = new Web3("http://localhost:7545");
-
-    // console.log(await web3.eth.getCode("0x4F828652c2bbd5B7db6FBF6b08e32639F656b352"));
+    const web3 = new Web3(window.ethereum);
 
     // Get contract instance
     const instance = new web3.eth.Contract(
-      TODO_LIST_ABI,
-      "0x96F0C4B9DeA2df4BAd0945a58a217f38f26cdE05" // smart contract address
+        TODO_LIST_CONFIG.abi,
+      "0x1814FfCab5879A3df9689BfB336ff12f4787121b" // smart contract address
     );
 
     setTodoList(instance);
@@ -87,9 +86,8 @@ export const ContractComponent = () => {
     }
 
     try {
-      // @ts-ignore
       await todoList.methods.createTask(content).send({
-        from: "0x6A0e008AeAaa9ed9FdBB8F9A092CcC04109FF1a6",
+        from: account,
         gas: "100000",
       });
       getTasks(todoList);
@@ -105,10 +103,7 @@ export const ContractComponent = () => {
     }
 
     try {
-      await todoList.methods.validateTask(id).send({
-        from: "0x6A0e008AeAaa9ed9FdBB8F9A092CcC04109FF1a6",
-        gas: "100000",
-      });
+      await todoList.methods.validateTask(id).call();
       getTasks(todoList);
     } catch (err) {
       console.error(err);
@@ -123,7 +118,7 @@ export const ContractComponent = () => {
 
     try {
       await todoList.methods.toggleCompleted(id).send({
-        from: "0x6A0e008AeAaa9ed9FdBB8F9A092CcC04109FF1a6",
+        from: account,
         gas: "100000",
       });
       getTasks(todoList);

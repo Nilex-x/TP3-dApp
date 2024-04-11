@@ -5,7 +5,7 @@ export const TODO_LIST_ABI = [
       { indexed: false, internalType: "uint256", name: "id", type: "uint256" },
       { indexed: false, internalType: "bool", name: "completed", type: "bool" },
     ],
-    name: "TaskCompleted",
+    name: "TaskComplet",
     type: "event",
   },
   {
