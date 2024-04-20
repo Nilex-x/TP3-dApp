@@ -1,9 +1,9 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
-import Web3, { Address, Contract, Uint } from "web3";
+import Web3, { Address, Contract, EventLog, Uint } from "web3";
 import { TODO_LIST_ABI } from "../config";
 import { WalletContext } from "../context/wallet";
 
-import { useSDK } from "@metamask/sdk-react";
+import { toast } from "react-toastify";
 import TODO_LIST_CONFIG from "../../../build/contracts/TodoList.json";
 
 interface TaskType {
@@ -19,7 +19,6 @@ export const ContractComponent = () => {
   const [todoList, setTodoList] = useState<Contract<typeof TODO_LIST_ABI>>();
   const [tasks, setTasks] = useState<Array<TaskType>>([]);
   const [content, setContent] = useState<string>("");
-  const { connected } = useSDK();
 
   const getTasks = async (todolist: Contract<typeof TODO_LIST_ABI>) => {
     const taskTmp: Array<TaskType> = [];
@@ -43,40 +42,68 @@ export const ContractComponent = () => {
     setTasks(taskTmp);
   };
 
-  // Load todolist with truffle
-  const loadTodolist = async () => {
-    // Load contract
-    const contract = await window.ethereum?.request({
-      method: "eth_getCode",
-      params: [import.meta.env.VITE_SMART_CONTRACT_ADDRESS], // smart contract address
-    });
-
-    // Check if contract is deployed
-    if (contract === "0x") {
-      console.log("Contract not deployed");
-      return;
-    }
-
-    const web3 = new Web3(window.ethereum);
-
-    // Get contract instance
-    const instance = new web3.eth.Contract(
-      TODO_LIST_CONFIG.abi,
-      import.meta.env.VITE_SMART_CONTRACT_ADDRESS // smart contract address
-    );
-
-    setTodoList(instance);
-
-    getTasks(instance);
-  };
-
   useEffect(() => {
+    // Load todolist with truffle
+    const loadTodolist = async () => {
+      // Load contract
+      const contract = await window.ethereum?.request({
+        method: "eth_getCode",
+        params: [import.meta.env.VITE_SMART_CONTRACT_ADDRESS], // smart contract address
+      });
+
+      // Check if contract is deployed
+      if (contract === "0x") {
+        console.log("Contract not deployed");
+        return;
+      }
+
+      const web3 = new Web3(window.ethereum);
+
+      // Get contract instance
+      const instance = new web3.eth.Contract(
+        TODO_LIST_CONFIG.abi,
+        import.meta.env.VITE_SMART_CONTRACT_ADDRESS // smart contract address
+      );
+
+      setTodoList(instance);
+
+      getTasks(instance);
+    };
+
+    const toastCreated = (event: EventLog) => {
+      toast(`Task "${event.returnValues.content}" created`, {
+        type: "success",
+      });
+    };
+    const toastValidated = (event: EventLog) => {
+      toast(`Task "${event.returnValues.content}" validated`, {
+        type: "info",
+      });
+    };
+    const toastCompleted = () => {
+      toast(`Task completed`, {
+        type: "info",
+      });
+    };
+
     if (!todoList) {
       loadTodolist();
     } else {
       getTasks(todoList);
+
+      todoList.events.TaskCreated().on("data", toastCreated);
+
+      todoList.events.TaskValidate().on("data", toastValidated);
+
+      todoList.events.TaskCompleted().on("data", toastCompleted);
     }
-  }, []);
+
+    return () => {
+      todoList?.events.TaskCreated().removeAllListeners();
+      todoList?.events.TaskValidate().removeAllListeners();
+      todoList?.events.TaskCompleted().removeAllListeners();
+    };
+  }, [todoList]);
 
   const createTask = async (e: FormEvent) => {
     e.preventDefault();
@@ -104,7 +131,10 @@ export const ContractComponent = () => {
     }
 
     try {
-      await todoList.methods.validateTask(id).call();
+      await todoList.methods.validateTask(id).send({
+        from: account,
+        gas: "100000",
+      });
       getTasks(todoList);
     } catch (err) {
       console.error(err);
@@ -128,7 +158,7 @@ export const ContractComponent = () => {
     }
   };
 
-  if (!connected || !account) {
+  if (!account) {
     return (
       <div className="mt-8">
         You need to connect your wallet to interact with the contract

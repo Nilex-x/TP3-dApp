@@ -14,6 +14,7 @@
     "lucide-react": "^0.367.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-toastify": "^10.0.5",
     "truffle": "^5.11.5",
     "truffle-contract": "^4.0.31",
     "web3": "^4.7.0"

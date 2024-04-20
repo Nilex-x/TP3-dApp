@@ -1,5 +1,7 @@
 import { MetaMaskProvider } from "@metamask/sdk-react";
 import { useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { ContractComponent as Contract } from "./components/contract";
 import { Wallet } from "./components/wallet";
@@ -26,6 +28,7 @@ function App() {
       >
         <Wallet />
         <Contract />
+        <ToastContainer position="bottom-right" />
       </WalletContext.Provider>
     </MetaMaskProvider>
   );
