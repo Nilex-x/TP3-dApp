@@ -1,4 +1,6 @@
 import { useSDK } from "@metamask/sdk-react";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 import { LoaderCircle } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import Web3 from "web3";
