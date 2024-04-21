@@ -45,6 +45,8 @@ export const ContractComponent = () => {
   useEffect(() => {
     // Load todolist with truffle
     const loadTodolist = async () => {
+        console.log(import.meta.env.VITE_SMART_CONTRACT_ADDRESS)
+
       // Load contract
       const contract = await window.ethereum?.request({
         method: "eth_getCode",
